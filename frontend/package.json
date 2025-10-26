@@ -1,0 +1,31 @@
+{
+  "name": "collab-docs-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@hocuspocus/provider": "3.2.3",
+    "@tiptap/extension-collaboration": "2.6.6",
+    "@tiptap/extension-collaboration-cursor": "2.6.6",
+    "@tiptap/react": "2.6.6",
+    "@tiptap/starter-kit": "2.6.6",
+    "@types/axios": "^0.9.36",
+    "axios": "^1.12.2",
+    "next": "14.2.5",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "yjs": "13.6.19"
+  },
+  "devDependencies": {
+    "@types/node": "^24.9.1",
+    "@types/react": "^19.2.2",
+    "eslint": "8.57.0",
+    "eslint-config-next": "14.2.5",
+    "typescript": "5.6.2"
+  }
+}
