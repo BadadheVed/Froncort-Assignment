@@ -14,12 +14,44 @@ export default function CollaborativeEditor({ documentId, user }: EditorProps) {
   const [userCount, setUserCount] = useState(1);
 
   const ydoc = useMemo(() => new Y.Doc(), []);
-  const provider = useMemo(() => new HocuspocusProvider({
-    url: "ws://localhost:1234",
-    name: documentId,
-    document: ydoc,
-    token: user.token,
-  }), [documentId, ydoc, user.token]);
+  const provider = useMemo(() => {
+    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:1234";
+    console.log("🔌 Connecting to WebSocket:", wsUrl);
+    
+    const provider = new HocuspocusProvider({
+      url: wsUrl,
+      name: documentId,
+      document: ydoc,
+      token: user.token,
+    });
+
+    // Set up event listeners
+    provider.on('open', () => {
+      console.log("🔌 WebSocket connection opened");
+      setStatus("connected");
+    });
+
+    provider.on('close', () => {
+      console.log("🔌 WebSocket connection closed");
+      setStatus("disconnected");
+    });
+
+    provider.on('disconnect', () => {
+      console.warn("⚠️ WebSocket disconnected");
+      setStatus("disconnected");
+    });
+
+    provider.on('synced', () => {
+      console.log("✅ Document synced");
+      setStatus("connected");
+    });
+
+    provider.on('awarenessUpdate', ({ states }: { states: any[] }) => {
+      setUserCount(states.length);
+    });
+
+    return provider;
+  }, [documentId, ydoc, user.token]);
 
   // Provider status & connection events
   useEffect(() => {
@@ -29,6 +61,14 @@ export default function CollaborativeEditor({ documentId, user }: EditorProps) {
     };
     const onConnect = () => {
       console.log("✅ Connected to Hocuspocus");
+      setStatus("connected");
+    };
+    const onAuthenticated = () => {
+      // Ensure UI leaves the loading state once authenticated
+      setStatus("connected");
+    };
+    const onSynced = () => {
+      // When initial sync completes, we are definitely connected
       setStatus("connected");
     };
     const onDisconnect = () => {
@@ -42,12 +82,16 @@ export default function CollaborativeEditor({ documentId, user }: EditorProps) {
 
     provider.on("status", onStatus);
     provider.on("connect", onConnect);
+    provider.on("authenticated", onAuthenticated);
+    provider.on("synced", onSynced);
     provider.on("disconnect", onDisconnect);
     provider.on("authenticationFailed", onAuthFailed);
 
     return () => {
       provider.off("status", onStatus);
       provider.off("connect", onConnect);
+      provider.off("authenticated", onAuthenticated);
+      provider.off("synced", onSynced);
       provider.off("disconnect", onDisconnect);
       provider.off("authenticationFailed", onAuthFailed);
     };
@@ -76,6 +120,7 @@ export default function CollaborativeEditor({ documentId, user }: EditorProps) {
   }, [provider, user.id, user.username]);
 
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit.configure({ history: false }),
       Collaboration.configure({ document: ydoc }),

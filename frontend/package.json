@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@hocuspocus/provider": "3.2.3",
+    "@hocuspocus/provider": "^3.4.0",
     "@tiptap/extension-collaboration": "2.6.6",
     "@tiptap/extension-collaboration-cursor": "2.6.6",
     "@tiptap/react": "2.6.6",
