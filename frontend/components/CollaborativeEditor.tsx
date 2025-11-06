@@ -23,24 +23,28 @@ import { generateUserColor } from "@/lib/colors";
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Bold, 
-  Italic, 
-  Underline as UnderlineIcon, 
-  Strikethrough, 
-  Code, 
-  Heading1, 
-  Heading2, 
-  Heading3, 
-  List, 
-  ListOrdered, 
-  Quote, 
-  Code2, 
-  Link2, 
-  Image as ImageIcon, 
+import {
+  Bold,
+  Italic,
+  Underline as UnderlineIcon,
+  Strikethrough,
+  Code,
+  Heading1,
+  Heading2,
+  Heading3,
+  List,
+  ListOrdered,
+  Quote,
+  Code2,
+  Link2,
+  Image as ImageIcon,
   Table as TableIcon,
   AlignLeft,
   AlignCenter,
@@ -48,7 +52,7 @@ import {
   AlignJustify,
   Youtube as YoutubeIcon,
   Palette,
-  Highlighter
+  Highlighter,
 } from "lucide-react";
 
 const MenuBar = ({ editor }: { editor: any }) => {
@@ -57,14 +61,14 @@ const MenuBar = ({ editor }: { editor: any }) => {
   }
 
   const addImage = () => {
-    const url = window.prompt('Enter the URL of the image:');
+    const url = window.prompt("Enter the URL of the image:");
     if (url) {
       editor.chain().focus().setImage({ src: url }).run();
     }
   };
 
   const addYoutubeVideo = () => {
-    const url = window.prompt('Enter YouTube URL:');
+    const url = window.prompt("Enter YouTube URL:");
     if (url) {
       editor.commands.setYoutubeVideo({
         src: url,
@@ -75,18 +79,22 @@ const MenuBar = ({ editor }: { editor: any }) => {
   };
 
   const setLink = () => {
-    const previousUrl = editor.getAttributes('link').href;
-    const url = window.prompt('URL', previousUrl);
+    const previousUrl = editor.getAttributes("link").href;
+    const url = window.prompt("URL", previousUrl);
     if (url === null) return;
-    if (url === '') {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run();
+    if (url === "") {
+      editor.chain().focus().extendMarkRange("link").unsetLink().run();
       return;
     }
-    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+    editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   };
 
   const addTable = () => {
-    editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+    editor
+      .chain()
+      .focus()
+      .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+      .run();
   };
 
   const setColor = (color: string) => {
@@ -98,7 +106,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
       <ToggleGroup type="multiple" className="flex flex-wrap gap-1">
         <Toggle
           size="sm"
-          pressed={editor.isActive('bold')}
+          pressed={editor.isActive("bold")}
           onPressedChange={() => editor.chain().focus().toggleBold().run()}
           className="data-[state=on]:bg-gray-700"
         >
@@ -106,7 +114,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
         </Toggle>
         <Toggle
           size="sm"
-          pressed={editor.isActive('italic')}
+          pressed={editor.isActive("italic")}
           onPressedChange={() => editor.chain().focus().toggleItalic().run()}
           className="data-[state=on]:bg-gray-700"
         >
@@ -114,7 +122,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
         </Toggle>
         <Toggle
           size="sm"
-          pressed={editor.isActive('underline')}
+          pressed={editor.isActive("underline")}
           onPressedChange={() => editor.chain().focus().toggleUnderline().run()}
           className="data-[state=on]:bg-gray-700"
         >
@@ -122,7 +130,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
         </Toggle>
         <Toggle
           size="sm"
-          pressed={editor.isActive('strike')}
+          pressed={editor.isActive("strike")}
           onPressedChange={() => editor.chain().focus().toggleStrike().run()}
           className="data-[state=on]:bg-gray-700"
         >
@@ -130,7 +138,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
         </Toggle>
         <Toggle
           size="sm"
-          pressed={editor.isActive('code')}
+          pressed={editor.isActive("code")}
           onPressedChange={() => editor.chain().focus().toggleCode().run()}
           className="data-[state=on]:bg-gray-700"
         >
@@ -138,118 +146,140 @@ const MenuBar = ({ editor }: { editor: any }) => {
         </Toggle>
         <Toggle
           size="sm"
-          pressed={editor.isActive('highlight')}
+          pressed={editor.isActive("highlight")}
           onPressedChange={() => editor.chain().focus().toggleHighlight().run()}
           className="data-[state=on]:bg-gray-700"
         >
           <Highlighter className="h-4 w-4" />
         </Toggle>
-        
+
         <Separator orientation="vertical" className="h-6 mx-1" />
-        
+
         <ToggleGroup type="single" className="flex">
           <Toggle
             size="sm"
-            pressed={editor.isActive('heading', { level: 1 })}
-            onPressedChange={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+            pressed={editor.isActive("heading", { level: 1 })}
+            onPressedChange={() =>
+              editor.chain().focus().toggleHeading({ level: 1 }).run()
+            }
             className="data-[state=on]:bg-gray-700"
           >
             <Heading1 className="h-4 w-4" />
           </Toggle>
           <Toggle
             size="sm"
-            pressed={editor.isActive('heading', { level: 2 })}
-            onPressedChange={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+            pressed={editor.isActive("heading", { level: 2 })}
+            onPressedChange={() =>
+              editor.chain().focus().toggleHeading({ level: 2 }).run()
+            }
             className="data-[state=on]:bg-gray-700"
           >
             <Heading2 className="h-4 w-4" />
           </Toggle>
           <Toggle
             size="sm"
-            pressed={editor.isActive('heading', { level: 3 })}
-            onPressedChange={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+            pressed={editor.isActive("heading", { level: 3 })}
+            onPressedChange={() =>
+              editor.chain().focus().toggleHeading({ level: 3 }).run()
+            }
             className="data-[state=on]:bg-gray-700"
           >
             <Heading3 className="h-4 w-4" />
           </Toggle>
         </ToggleGroup>
-        
+
         <Separator orientation="vertical" className="h-6 mx-1" />
-        
+
         <ToggleGroup type="single" className="flex">
           <Toggle
             size="sm"
-            pressed={editor.isActive('bulletList')}
-            onPressedChange={() => editor.chain().focus().toggleBulletList().run()}
+            pressed={editor.isActive("bulletList")}
+            onPressedChange={() =>
+              editor.chain().focus().toggleBulletList().run()
+            }
             className="data-[state=on]:bg-gray-700"
           >
             <List className="h-4 w-4" />
           </Toggle>
           <Toggle
             size="sm"
-            pressed={editor.isActive('orderedList')}
-            onPressedChange={() => editor.chain().focus().toggleOrderedList().run()}
+            pressed={editor.isActive("orderedList")}
+            onPressedChange={() =>
+              editor.chain().focus().toggleOrderedList().run()
+            }
             className="data-[state=on]:bg-gray-700"
           >
             <ListOrdered className="h-4 w-4" />
           </Toggle>
           <Toggle
             size="sm"
-            pressed={editor.isActive('blockquote')}
-            onPressedChange={() => editor.chain().focus().toggleBlockquote().run()}
+            pressed={editor.isActive("blockquote")}
+            onPressedChange={() =>
+              editor.chain().focus().toggleBlockquote().run()
+            }
             className="data-[state=on]:bg-gray-700"
           >
             <Quote className="h-4 w-4" />
           </Toggle>
           <Toggle
             size="sm"
-            pressed={editor.isActive('codeBlock')}
-            onPressedChange={() => editor.chain().focus().toggleCodeBlock().run()}
+            pressed={editor.isActive("codeBlock")}
+            onPressedChange={() =>
+              editor.chain().focus().toggleCodeBlock().run()
+            }
             className="data-[state=on]:bg-gray-700"
           >
             <Code className="h-4 w-4" />
           </Toggle>
         </ToggleGroup>
-        
+
         <Separator orientation="vertical" className="h-6 mx-1" />
-        
+
         <ToggleGroup type="single" className="flex">
           <Toggle
             size="sm"
-            pressed={editor.isActive({ textAlign: 'left' })}
-            onPressedChange={() => editor.chain().focus().setTextAlign('left').run()}
+            pressed={editor.isActive({ textAlign: "left" })}
+            onPressedChange={() =>
+              editor.chain().focus().setTextAlign("left").run()
+            }
             className="data-[state=on]:bg-gray-700"
           >
             <AlignLeft className="h-4 w-4" />
           </Toggle>
           <Toggle
             size="sm"
-            pressed={editor.isActive({ textAlign: 'center' })}
-            onPressedChange={() => editor.chain().focus().setTextAlign('center').run()}
+            pressed={editor.isActive({ textAlign: "center" })}
+            onPressedChange={() =>
+              editor.chain().focus().setTextAlign("center").run()
+            }
             className="data-[state=on]:bg-gray-700"
           >
             <AlignCenter className="h-4 w-4" />
           </Toggle>
           <Toggle
             size="sm"
-            pressed={editor.isActive({ textAlign: 'right' })}
-            onPressedChange={() => editor.chain().focus().setTextAlign('right').run()}
+            pressed={editor.isActive({ textAlign: "right" })}
+            onPressedChange={() =>
+              editor.chain().focus().setTextAlign("right").run()
+            }
             className="data-[state=on]:bg-gray-700"
           >
             <AlignRight className="h-4 w-4" />
           </Toggle>
           <Toggle
             size="sm"
-            pressed={editor.isActive({ textAlign: 'justify' })}
-            onPressedChange={() => editor.chain().focus().setTextAlign('justify').run()}
+            pressed={editor.isActive({ textAlign: "justify" })}
+            onPressedChange={() =>
+              editor.chain().focus().setTextAlign("justify").run()
+            }
             className="data-[state=on]:bg-gray-700"
           >
             <AlignJustify className="h-4 w-4" />
           </Toggle>
         </ToggleGroup>
-        
+
         <Separator orientation="vertical" className="h-6 mx-1" />
-        
+
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="ghost" size="sm" className="h-8">
@@ -258,7 +288,16 @@ const MenuBar = ({ editor }: { editor: any }) => {
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-2 grid grid-cols-5 gap-1">
-            {['#000000', '#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899'].map((color) => (
+            {[
+              "#000000",
+              "#ef4444",
+              "#f97316",
+              "#eab308",
+              "#22c55e",
+              "#3b82f6",
+              "#8b5cf6",
+              "#ec4899",
+            ].map((color) => (
               <button
                 key={color}
                 className="w-6 h-6 rounded-full border border-gray-700"
@@ -269,43 +308,28 @@ const MenuBar = ({ editor }: { editor: any }) => {
             ))}
           </PopoverContent>
         </Popover>
-        
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="h-8"
-          onClick={setLink}
-        >
+
+        <Button variant="ghost" size="sm" className="h-8" onClick={setLink}>
           <Link2 className="h-4 w-4 mr-1" />
           Link
         </Button>
-        
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="h-8"
-          onClick={addImage}
-        >
+
+        <Button variant="ghost" size="sm" className="h-8" onClick={addImage}>
           <ImageIcon className="h-4 w-4 mr-1" />
           Image
         </Button>
-        
-        <Button 
-          variant="ghost" 
-          size="sm" 
+
+        <Button
+          variant="ghost"
+          size="sm"
           className="h-8"
           onClick={addYoutubeVideo}
         >
           <YoutubeIcon className="h-4 w-4 mr-1" />
           YouTube
         </Button>
-        
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="h-8"
-          onClick={addTable}
-        >
+
+        <Button variant="ghost" size="sm" className="h-8" onClick={addTable}>
           <TableIcon className="h-4 w-4 mr-1" />
           Table
         </Button>
@@ -318,14 +342,14 @@ const BubbleMenuBar = ({ editor }: { editor: any }) => {
   if (!editor) return null;
 
   return (
-    <BubbleMenu 
-      editor={editor} 
+    <BubbleMenu
+      editor={editor}
       tippyOptions={{ duration: 100 }}
       className="bg-gray-800 border border-gray-700 rounded-md shadow-lg p-1 flex gap-1"
     >
       <Toggle
         size="sm"
-        pressed={editor.isActive('bold')}
+        pressed={editor.isActive("bold")}
         onPressedChange={() => editor.chain().focus().toggleBold().run()}
         className="data-[state=on]:bg-gray-700"
       >
@@ -333,7 +357,7 @@ const BubbleMenuBar = ({ editor }: { editor: any }) => {
       </Toggle>
       <Toggle
         size="sm"
-        pressed={editor.isActive('italic')}
+        pressed={editor.isActive("italic")}
         onPressedChange={() => editor.chain().focus().toggleItalic().run()}
         className="data-[state=on]:bg-gray-700"
       >
@@ -341,7 +365,7 @@ const BubbleMenuBar = ({ editor }: { editor: any }) => {
       </Toggle>
       <Toggle
         size="sm"
-        pressed={editor.isActive('underline')}
+        pressed={editor.isActive("underline")}
         onPressedChange={() => editor.chain().focus().toggleUnderline().run()}
         className="data-[state=on]:bg-gray-700"
       >
@@ -349,7 +373,7 @@ const BubbleMenuBar = ({ editor }: { editor: any }) => {
       </Toggle>
       <Toggle
         size="sm"
-        pressed={editor.isActive('strike')}
+        pressed={editor.isActive("strike")}
         onPressedChange={() => editor.chain().focus().toggleStrike().run()}
         className="data-[state=on]:bg-gray-700"
       >
@@ -357,16 +381,21 @@ const BubbleMenuBar = ({ editor }: { editor: any }) => {
       </Toggle>
       <Toggle
         size="sm"
-        pressed={editor.isActive('link')}
+        pressed={editor.isActive("link")}
         onPressedChange={() => {
-          const previousUrl = editor.getAttributes('link').href;
-          const url = window.prompt('URL', previousUrl);
+          const previousUrl = editor.getAttributes("link").href;
+          const url = window.prompt("URL", previousUrl);
           if (url === null) return;
-          if (url === '') {
-            editor.chain().focus().extendMarkRange('link').unsetLink().run();
+          if (url === "") {
+            editor.chain().focus().extendMarkRange("link").unsetLink().run();
             return;
           }
-          editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+          editor
+            .chain()
+            .focus()
+            .extendMarkRange("link")
+            .setLink({ href: url })
+            .run();
         }}
         className="data-[state=on]:bg-gray-700"
       >
@@ -377,15 +406,15 @@ const BubbleMenuBar = ({ editor }: { editor: any }) => {
 };
 
 export default function CollaborativeEditor({ documentId, user }: EditorProps) {
-  const [status, setStatus] = useState<"connecting" | "connected" | "disconnected">("connecting");
+  const [status, setStatus] = useState<
+    "connecting" | "connected" | "disconnected"
+  >("connecting");
   const [userCount, setUserCount] = useState(1);
   const [provider, setProvider] = useState<HocuspocusProvider | null>(null);
   const [isProviderReady, setIsProviderReady] = useState(false);
 
-  
   const ydoc = useMemo(() => new Y.Doc(), []);
 
-  
   useEffect(() => {
     if (!user?.token) {
       console.error("No user token available");
@@ -449,95 +478,98 @@ export default function CollaborativeEditor({ documentId, user }: EditorProps) {
 
   const editor = useEditor(
     {
-      extensions: provider && isProviderReady
-        ? [
-            StarterKit.configure({
-              history: false,
-              codeBlock: {
-                HTMLAttributes: {
-                  class: 'bg-gray-800 rounded p-4 my-2 font-mono text-sm',
+      extensions:
+        provider && isProviderReady
+          ? [
+              StarterKit.configure({
+                history: false,
+                codeBlock: {
+                  HTMLAttributes: {
+                    class: "bg-gray-800 rounded p-4 my-2 font-mono text-sm",
+                  },
                 },
-              },
-              bulletList: {
-                HTMLAttributes: {
-                  class: 'list-disc pl-5 my-2',
+                bulletList: {
+                  HTMLAttributes: {
+                    class: "list-disc pl-5 my-2",
+                  },
                 },
-              },
-              orderedList: {
-                HTMLAttributes: {
-                  class: 'list-decimal pl-5 my-2',
+                orderedList: {
+                  HTMLAttributes: {
+                    class: "list-decimal pl-5 my-2",
+                  },
                 },
-              },
-              blockquote: {
-                HTMLAttributes: {
-                  class: 'border-l-4 border-gray-500 pl-4 py-1 my-2 text-gray-300',
+                blockquote: {
+                  HTMLAttributes: {
+                    class:
+                      "border-l-4 border-gray-500 pl-4 py-1 my-2 text-gray-300",
+                  },
                 },
-              },
-            }),
-            TextAlign.configure({
-              types: ['heading', 'paragraph', 'image'],
-              alignments: ['left', 'center', 'right', 'justify'],
-              defaultAlignment: 'left',
-            }),
-            Link.configure({
-              openOnClick: true,
-              HTMLAttributes: {
-                class: 'text-blue-400 hover:text-blue-300 underline',
-              },
-            }),
-            Underline,
-            TextStyle,
-            Color,
-            Highlight.configure({
-              multicolor: true,
-            }),
-            TiptapImage.configure({
-              inline: true,
-              allowBase64: true,
-              HTMLAttributes: {
-                class: 'rounded-md my-2 max-w-full h-auto',
-              },
-            }),
-            Youtube.configure({
-              inline: false,
-              allowFullscreen: true,
-              HTMLAttributes: {
-                class: 'w-full aspect-video my-4',
-              },
-            }),
-            Table.configure({
-              resizable: true,
-              HTMLAttributes: {
-                class: 'border-collapse w-full my-4',
-              },
-            }),
-            TableRow,
-            TableHeader,
-            TableCell,
-            Collaboration.configure({
-              document: ydoc,
-            }),
-            CollaborationCursor.configure({
-              provider: provider,
-              user: {
-                name: user?.username || "Anonymous",
-                color: user ? generateUserColor(user.id) : "#000000",
-              },
-            }),
-          ]
-        : [
-            StarterKit.configure({ history: false }),
-            Collaboration.configure({
-              document: ydoc,
-            }),
-          ],
+              }),
+              TextAlign.configure({
+                types: ["heading", "paragraph", "image"],
+                alignments: ["left", "center", "right", "justify"],
+                defaultAlignment: "left",
+              }),
+              Link.configure({
+                openOnClick: true,
+                HTMLAttributes: {
+                  class: "text-blue-400 hover:text-blue-300 underline",
+                },
+              }),
+              Underline,
+              TextStyle,
+              Color,
+              Highlight.configure({
+                multicolor: true,
+              }),
+              TiptapImage.configure({
+                inline: true,
+                allowBase64: true,
+                HTMLAttributes: {
+                  class: "rounded-md my-2 max-w-full h-auto",
+                },
+              }),
+              Youtube.configure({
+                inline: false,
+                allowFullscreen: true,
+                HTMLAttributes: {
+                  class: "w-full aspect-video my-4",
+                },
+              }),
+              Table.configure({
+                resizable: true,
+                HTMLAttributes: {
+                  class: "border-collapse w-full my-4",
+                },
+              }),
+              TableRow,
+              TableHeader,
+              TableCell,
+              Collaboration.configure({
+                document: ydoc,
+              }),
+              CollaborationCursor.configure({
+                provider: provider,
+                user: {
+                  name: user?.username || "Anonymous",
+                  color: generateUserColor(user?.id || "anonymous"),
+                },
+              }),
+            ]
+          : [
+              StarterKit.configure({ history: false }),
+              Collaboration.configure({
+                document: ydoc,
+              }),
+            ],
       editorProps: {
         attributes: {
-          class: "prose prose-invert max-w-none min-h-[60vh] focus:outline-none p-4",
+          class:
+            "prose prose-invert max-w-none min-h-[60vh] focus:outline-none p-4",
         },
       },
     },
-    [provider, isProviderReady] 
+    [provider, isProviderReady]
   );
   useEffect(() => {
     return () => {
@@ -557,7 +589,9 @@ export default function CollaborativeEditor({ documentId, user }: EditorProps) {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4" />
           <p className="text-gray-400">
-            {!provider ? "Initializing..." : "Connecting to collaboration server..."}
+            {!provider
+              ? "Initializing..."
+              : "Connecting to collaboration server..."}
           </p>
         </div>
       </div>
@@ -592,13 +626,12 @@ export default function CollaborativeEditor({ documentId, user }: EditorProps) {
       <div className="border border-gray-800 rounded-md bg-gray-900/50 overflow-hidden">
         {editor && <MenuBar editor={editor} />}
         {editor && <BubbleMenuBar editor={editor} />}
-        <EditorContent 
-          editor={editor} 
+        <EditorContent
+          editor={editor}
           className="min-h-[60vh] p-4 focus:outline-none overflow-y-auto"
         />
       </div>
 
-      
       <style jsx global>{`
         .collaboration-cursor__caret {
           border-left: 2px solid;
@@ -630,60 +663,60 @@ export default function CollaborativeEditor({ documentId, user }: EditorProps) {
           color: #e5e7eb;
           padding: 1rem;
         }
-        
+
         .prose-invert h1 {
           font-size: 2.25rem;
           font-weight: 700;
           margin: 1.5rem 0 1rem;
           line-height: 1.2;
         }
-        
+
         .prose-invert h2 {
           font-size: 1.875rem;
           font-weight: 600;
           margin: 1.25rem 0 1rem;
           line-height: 1.3;
         }
-        
+
         .prose-invert h3 {
           font-size: 1.5rem;
           font-weight: 600;
           margin: 1rem 0;
           line-height: 1.4;
         }
-        
+
         .prose-invert p {
           margin: 1rem 0;
           line-height: 1.7;
         }
-        
+
         .prose-invert img {
           border-radius: 0.5rem;
           margin: 1.5rem 0;
         }
-        
+
         .prose-invert table {
           width: 100%;
           border-collapse: collapse;
           margin: 1.5rem 0;
         }
-        
+
         .prose-invert th,
         .prose-invert td {
           border: 1px solid #374151;
           padding: 0.5rem 1rem;
           text-align: left;
         }
-        
+
         .prose-invert th {
           background-color: rgba(55, 65, 81, 0.5);
           font-weight: 600;
         }
-        
+
         .prose-invert tr:nth-child(even) {
           background-color: rgba(31, 41, 55, 0.5);
         }
-        
+
         .ProseMirror:focus {
           outline: none;
         }
