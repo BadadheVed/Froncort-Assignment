@@ -1,26 +1,20 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
-import authRoutes from "./routes/auth.routes";
-import documentRoutes from "./routes/documents.routes";
-import prisma from "./models/prisma";
-
-dotenv.config();
+import docsRouter from "@/routers/docs";
 
 const app = express();
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+app.use(cors({ origin: frontendUrl, credentials: true }));
 app.use(express.json());
 
-app.use("/api/auth", authRoutes);
-app.use("/api/documents", documentRoutes);
+app.use("/docs", docsRouter);
 
 const PORT = Number(process.env.PORT || 3001);
 
 (async () => {
   try {
-    await prisma.$connect();
     app.listen(PORT, () => {
-      console.log(`API server running on http://localhost:${PORT}`);
+      console.log(`API server running on ${frontendUrl}:${PORT}`);
     });
   } catch (err) {
     console.error("Failed to start server", err);

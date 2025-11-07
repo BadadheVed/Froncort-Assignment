@@ -5,15 +5,14 @@ import { generateRoomCode, generatePin } from "@/utils/codes";
 export const createDocument = async (req: Request, res: Response) => {
   try {
     const { title } = req.body as { title: string };
-    
 
-    if (!title ) {
+    if (!title) {
       return res.status(400).json({ message: "Missing title or user info" });
     }
 
-    
     const docId = parseInt(generateRoomCode());
     const pin = parseInt(generatePin());
+    const baseURL = process.env.BASE_URL || "http://localhost:3000";
 
     const doc = await prisma.document.create({
       data: {
@@ -31,10 +30,14 @@ export const createDocument = async (req: Request, res: Response) => {
         updatedAt: true,
       },
     });
+    const joinLink = `${baseURL}/join?docId=${doc.id}`;
 
     return res.status(201).json({
       message: "Document created successfully",
       document: doc,
+      joinLink: joinLink,
+      DocId: doc.docId,
+      Pin: doc.pin,
     });
   } catch (err) {
     console.error("Error creating document:", err);
@@ -42,22 +45,19 @@ export const createDocument = async (req: Request, res: Response) => {
   }
 };
 
-
 export const joinDocument = async (req: Request, res: Response) => {
-
-
   try {
     const { docId, pin } = req.body as { docId: number; pin: number };
-    if(!docId || !pin){
+    if (!docId || !pin) {
       return res.status(400).json({ message: "Missing document ID or pin" });
     }
     const document = await prisma.document.findFirst({
-     where: {
+      where: {
         docId: docId,
         pin: pin,
       },
     });
-    
+
     if (!document) {
       return res.status(404).json({ message: "Document not found" });
     }
@@ -70,5 +70,4 @@ export const joinDocument = async (req: Request, res: Response) => {
     console.error("Error joining document:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
-}
-  
+};
