@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,21 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String    @id @default(uuid()) @db.Uuid
-  username  String    @unique @db.VarChar(50)
-  email     String    @unique @db.VarChar(255)
-  password  String
-  createdAt DateTime  @default(now()) @map("created_at")
-  documents Document[]
-}
-
 model Document {
   id        String   @id @default(uuid()) @db.Uuid
   title     String   @db.VarChar(255)
-  ownerId   String   @db.Uuid @map("owner_id")
-  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  content   String?  @db.Text
+  docId     Int
+  pin       Int?
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  Content   Json?
 }
