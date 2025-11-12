@@ -1,97 +1,77 @@
 import { Server } from "@hocuspocus/server";
 import * as Y from "yjs";
-import dotenv from "dotenv";
 import chalk from "chalk";
-import { verifyToken } from "./auth";
-import { AuthPayload, ConnectPayload, LoadPayload, ConnectionContext } from "./types";
+import dotenv from "dotenv";
+import { validateJoinAccess } from "./auth";
 
 dotenv.config();
 
 const PORT = Number(process.env.PORT || 1234);
-const JWT_SECRET = process.env.JWT_SECRET as string;
 
+/**
+ * Each document's UUID acts as a WebSocket room name.
+ * The backend validates docId + pin, and if valid, users
+ * join the UUID-based room for real-time collaboration.
+ */
 const server = new Server({
   port: PORT,
-  async onAuthenticate(data: AuthPayload) {
-    const docName = data.documentName;
-    const rawAuth = data.requestHeaders?.authorization ?? data.requestHeaders?.Authorization;
-    const authHeader = Array.isArray(rawAuth) ? rawAuth[0] : rawAuth;
-    const headerToken = authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : undefined;
-    const paramToken = data.requestParameters?.get("token") ?? undefined;
-    const directToken = data.token;
-    const token = directToken || paramToken || headerToken;
-    
-    if (!token) {
-      console.log(chalk.yellow(" Auth attempt:") + " " + chalk.red("missing token"), chalk.gray(`doc=${docName}`));
+
+  async onAuthenticate(data) {
+    const roomUUID = data.documentName; // UUID = WebSocket room name
+    const docId = data.requestParameters?.get("docId"); // 9-digit numeric code
+    const pin = data.requestParameters?.get("pin"); // 4-digit pin
+    const name = data.requestParameters?.get("name"); // user's display name
+
+    if (!docId || !pin || !name) {
+      console.log(chalk.red("❌ Missing docId, pin, or name"));
       throw new Error("Unauthorized");
     }
-    
-    const user = verifyToken(token, JWT_SECRET);
-    if (!user) {
-      console.log(chalk.yellow(" Auth attempt:") + " " + chalk.red("invalid token"), chalk.gray(`doc=${docName}`));
+
+    const document = await validateJoinAccess(Number(docId), Number(pin));
+
+    if (!document) {
+      console.log(
+        chalk.red(`❌ Invalid access for docId=${docId}, pin=${pin}`)
+      );
       throw new Error("Unauthorized");
     }
-    
-    // Store user in context
-    data.context.user = user;
-    console.log(chalk.yellow(" Auth success:"), chalk.cyan(user.username), chalk.gray(`doc=${docName}`));
-    
-    return {
-      user: {
-        id: user.id,
-        name: user.username,
-      },
-    };
+
+    // ✅ If backend confirms, user joins the UUID room
+    console.log(
+      chalk.green("✅ Auth success:"),
+      chalk.cyan(name),
+      chalk.gray(`room=${roomUUID}`)
+    );
+
+    data.context.user = { name };
+    return { user: { name } };
   },
 
-  async onConnect(data: ConnectPayload) {
-    console.log(chalk.green(" Connect:"), chalk.gray(`doc=${data.documentName}`));
-    
-    // Ensure user context is set
-    if (!data.context.user && data.connection?.token) {
-      try {
-        const user = verifyToken(data.connection.token, JWT_SECRET);
-        if (user) {
-          data.context.user = user;
-        }
-      } catch (error) {
-        console.log(chalk.yellow(" Could not verify token in onConnect"), error);
-      }
-    }
+  async onConnect({ documentName, context }) {
+    console.log(
+      chalk.green("🟢 Connected:"),
+      chalk.cyan(context.user?.name),
+      chalk.gray(`room=${documentName}`)
+    );
   },
 
-  async onDisconnect(data: ConnectPayload) {
-    const doc = data.documentName || 'unknown-document';
-    const username = data.context.user?.username || 'unknown';
-    
-    if (data.context.user) {
-      console.log(chalk.red(" Disconnect:"), chalk.cyan(username), chalk.gray(`doc=${doc}`));
-    } else {
-      console.log(chalk.red(" Disconnect:"), chalk.gray(`doc=${doc} (no user context)`));
-    }
+  async onDisconnect({ documentName, context }) {
+    console.log(
+      chalk.red("Disconnected: From the websocket server"),
+      chalk.cyan(context.user?.name),
+      chalk.gray(`room=${documentName}`)
+    );
   },
 
-  async onLoadDocument(data: LoadPayload) {
-    console.log(chalk.blue(" Load document:"), chalk.gray(data.documentName));
+  async onLoadDocument({ documentName }) {
+    console.log(chalk.blue("📄 Loading document:"), chalk.gray(documentName));
+
     return new Y.Doc();
   },
 });
 
-// Start the WebSocket server
-server.listen()
-  .then(() => {
-    console.log(chalk.green(`✅ WebSocket server running on ws://localhost:${PORT}`));
-  })
-  .catch((error: Error) => {
-    console.error(chalk.red('❌ Failed to start server:'), error);
-    process.exit(1);
-  });
-
-// Handle graceful shutdown
-process.on('SIGTERM', () => {
-  console.log(chalk.yellow('\n🛑 Received SIGTERM. Shutting down gracefully...'));
-  server.destroy().then(() => {
-    console.log(chalk.green('✅ Server has been shut down'));
-    process.exit(0);
-  });
+server.listen().then(() => {
+  console.log(
+    chalk.green(`✅ WebSocket server running on ws://localhost:${PORT}`)
+  );
 });

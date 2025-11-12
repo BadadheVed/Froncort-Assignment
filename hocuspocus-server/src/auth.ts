@@ -1,11 +1,24 @@
-import jwt from "jsonwebtoken";
-import type { AuthToken } from "./types";
+import { axiosInstance } from "./axios/axios";
 
-export const verifyToken = (token: string, secret: string): AuthToken | null => {
+export const validateJoinAccess = async (docId: number, pin: number) => {
   try {
-    const payload = jwt.verify(token, secret) as AuthToken & { iat: number; exp: number };
-    return { id: payload.id, username: payload.username, email: payload.email };
-  } catch {
+    const response = await axiosInstance.post("/api/docs/join", {
+      docId,
+      pin,
+    });
+
+    if (response.status !== 200) {
+      console.error(`❌ Join validation failed (status: ${response.status})`);
+      return null;
+    }
+
+    const { id, title } = response.data;
+    return { id, title };
+  } catch (error: any) {
+    console.error(
+      "❌ Backend join validation failed:",
+      error.response?.data || error.message
+    );
     return null;
   }
 };

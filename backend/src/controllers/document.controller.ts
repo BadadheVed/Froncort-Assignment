@@ -7,14 +7,14 @@ export const createDocument = async (req: Request, res: Response) => {
     const { title } = req.body as { title: string };
 
     if (!title) {
-      return res.status(400).json({ message: "Missing title or user info" });
+      return res.status(400).json({ message: "Missing title" });
     }
 
     const docId = parseInt(generateRoomCode());
     const pin = parseInt(generatePin());
     const baseURL = process.env.BASE_URL || "http://localhost:3000";
 
-    const doc = await prisma.document.create({
+    const document = await prisma.document.create({
       data: {
         title,
         docId,
@@ -22,22 +22,22 @@ export const createDocument = async (req: Request, res: Response) => {
         Content: "",
       },
       select: {
-        id: true,
+        id: true, // UUID (used for WebSocket room)
         title: true,
-        docId: true,
-        pin: true,
+        docId: true, // 9-digit numeric code
+        pin: true, // 4-digit access code
         createdAt: true,
-        updatedAt: true,
       },
     });
-    const joinLink = `${baseURL}/join?docId=${doc.id}`;
+
+    const joinLink = `${baseURL}/join?docId=${document.docId}`;
 
     return res.status(201).json({
       message: "Document created successfully",
-      document: doc,
-      joinLink: joinLink,
-      DocId: doc.docId,
-      Pin: doc.pin,
+      id: document.id,
+      docId: document.docId,
+      pin: document.pin,
+      joinLink,
     });
   } catch (err) {
     console.error("Error creating document:", err);
@@ -48,23 +48,24 @@ export const createDocument = async (req: Request, res: Response) => {
 export const joinDocument = async (req: Request, res: Response) => {
   try {
     const { docId, pin } = req.body as { docId: number; pin: number };
+
     if (!docId || !pin) {
       return res.status(400).json({ message: "Missing document ID or pin" });
     }
+
     const document = await prisma.document.findFirst({
-      where: {
-        docId: docId,
-        pin: pin,
-      },
+      where: { docId, pin },
+      select: { id: true, title: true },
     });
 
     if (!document) {
       return res.status(404).json({ message: "Document not found" });
     }
+
     return res.status(200).json({
-      message: "Document Ready To Join",
-      document: document,
+      message: "Document ready to join",
       id: document.id,
+      title: document.title,
     });
   } catch (error) {
     console.error("Error joining document:", error);
