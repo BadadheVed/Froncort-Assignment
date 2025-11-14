@@ -431,18 +431,19 @@ export default function CollaborativeEditor({ documentId, user }: EditorProps) {
     }
 
     const [docId, pin, name] = tokenParts;
-    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:1234";
+    let wsUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:1234";
+
+    // Add query parameters to WebSocket URL
+    wsUrl = `${wsUrl}?docId=${docId}&pin=${pin}&name=${encodeURIComponent(
+      name
+    )}`;
+
     console.log("🔌 Initializing WebSocket connection to:", wsUrl);
+    console.log("📋 Credentials:", { docId, pin, name });
 
     try {
-      // Construct URL with query parameters
-      const wsUrlWithParams = new URL(wsUrl);
-      wsUrlWithParams.searchParams.set("docId", docId);
-      wsUrlWithParams.searchParams.set("pin", pin);
-      wsUrlWithParams.searchParams.set("name", name);
-
       const newProvider = new HocuspocusProvider({
-        url: wsUrlWithParams.toString(),
+        url: wsUrl,
         name: documentId, // This is the UUID for the WebSocket room
         document: ydoc,
         onConnect: () => {

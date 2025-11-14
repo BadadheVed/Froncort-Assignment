@@ -2,7 +2,7 @@ import { axiosInstance } from "./axios/axios";
 
 export const validateJoinAccess = async (docId: number, pin: number) => {
   try {
-    const response = await axiosInstance.post("/api/docs/join", {
+    const response = await axiosInstance.post("/docs/join", {
       docId,
       pin,
     });

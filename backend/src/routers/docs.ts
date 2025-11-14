@@ -1,9 +1,12 @@
 import { Router } from "express";
-import { createDocument, joinDocument } from "@/controllers/document.controller";
+import {
+  createDocument,
+  joinDocument,
+} from "@/controllers/document.controller";
 
-const router = Router();
+const docsRouter = Router();
 
-router.post("/create", createDocument);
-router.post("/join", joinDocument);
+docsRouter.post("/create", createDocument);
+docsRouter.post("/join", joinDocument);
 
-export default router;
+export default docsRouter;

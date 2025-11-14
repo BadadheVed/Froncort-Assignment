@@ -18,9 +18,18 @@ const server = new Server({
 
   async onAuthenticate(data) {
     const roomUUID = data.documentName; // UUID = WebSocket room name
-    const docId = data.requestParameters?.get("docId"); // 9-digit numeric code
-    const pin = data.requestParameters?.get("pin"); // 4-digit pin
-    const name = data.requestParameters?.get("name"); // user's display name
+
+    // Get parameters from the connection request
+    const docId = data.requestParameters.get("docId"); // 9-digit numeric code
+    const pin = data.requestParameters.get("pin"); // 4-digit pin
+    const name = data.requestParameters.get("name"); // user's display name
+
+    console.log(chalk.yellow("🔍 Auth attempt:"), {
+      docId,
+      pin,
+      name,
+      roomUUID,
+    });
 
     if (!docId || !pin || !name) {
       console.log(chalk.red("❌ Missing docId, pin, or name"));
