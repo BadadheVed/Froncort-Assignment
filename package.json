@@ -1,0 +1,15 @@
+{
+  "name": "froncort-assignment",
+  "version": "1.0.0",
+  "description": "Collaborative Document Editor with WebSocket support",
+  "scripts": {
+    "install:all": "cd backend && npm install && cd ../frontend && npm install && cd ../hocuspocus-server && npm install",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:ws": "cd hocuspocus-server && npm run dev",
+    "setup": "cd backend && npx prisma db push && npx prisma generate"
+  },
+  "keywords": ["collaborative", "editor", "websocket", "tiptap"],
+  "author": "",
+  "license": "MIT"
+}

@@ -22,7 +22,7 @@ import type { EditorProps } from "@/types/editor.types";
 import { generateUserColor } from "@/lib/colors";
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { ToggleGroup } from "@/components/ui/toggle-group";
 import {
   Popover,
   PopoverContent,
@@ -412,6 +412,8 @@ export default function CollaborativeEditor({ documentId, user }: EditorProps) {
   const [userCount, setUserCount] = useState(1);
   const [provider, setProvider] = useState<HocuspocusProvider | null>(null);
   const [isProviderReady, setIsProviderReady] = useState(false);
+  const [documentTitle, setDocumentTitle] =
+    useState<string>("Untitled Document");
 
   const ydoc = useMemo(() => new Y.Doc(), []);
 
@@ -421,15 +423,28 @@ export default function CollaborativeEditor({ documentId, user }: EditorProps) {
       return;
     }
 
+    // Parse credentials from token (format: "docId:pin:name")
+    const tokenParts = user.token.split(":");
+    if (tokenParts.length !== 3) {
+      console.error("Invalid token format");
+      return;
+    }
+
+    const [docId, pin, name] = tokenParts;
     const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:1234";
     console.log("🔌 Initializing WebSocket connection to:", wsUrl);
 
     try {
+      // Construct URL with query parameters
+      const wsUrlWithParams = new URL(wsUrl);
+      wsUrlWithParams.searchParams.set("docId", docId);
+      wsUrlWithParams.searchParams.set("pin", pin);
+      wsUrlWithParams.searchParams.set("name", name);
+
       const newProvider = new HocuspocusProvider({
-        url: wsUrl,
-        name: documentId,
+        url: wsUrlWithParams.toString(),
+        name: documentId, // This is the UUID for the WebSocket room
         document: ydoc,
-        token: user.token,
         onConnect: () => {
           console.log("✅ Connected to Hocuspocus server");
           setIsProviderReady(true);
@@ -601,24 +616,30 @@ export default function CollaborativeEditor({ documentId, user }: EditorProps) {
   return (
     <div className="space-y-4">
       <header className="sticky top-0 z-10 bg-gray-900/80 backdrop-blur supports-[backdrop-filter]:bg-gray-900/60 border border-gray-800 rounded-md px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span
-            className={`h-3 w-3 rounded-full ${statusColor} ${
-              status === "connecting" ? "animate-pulse" : ""
-            }`}
-            title={status}
-          />
-          <span className="text-sm text-gray-300">
-            Users: <span className="text-white font-medium">{userCount}</span>
-          </span>
+        <div className="flex items-center gap-4">
+          <h1 className="text-lg font-semibold text-white truncate max-w-md">
+            {documentTitle}
+          </h1>
+          <div className="flex items-center gap-3">
+            <span
+              className={`h-3 w-3 rounded-full ${statusColor} ${
+                status === "connecting" ? "animate-pulse" : ""
+              }`}
+              title={status}
+            />
+            <span className="text-sm text-gray-300">
+              <span className="text-white font-medium">{userCount}</span>{" "}
+              {userCount === 1 ? "user" : "users"}
+            </span>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-400">
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-gray-400 px-2 py-1 bg-gray-800 rounded">
             {status === "connected"
-              ? "Connected"
+              ? "🟢 Connected"
               : status === "connecting"
-              ? "Connecting..."
-              : "Disconnected"}
+              ? "🟡 Connecting..."
+              : "🔴 Disconnected"}
           </span>
         </div>
       </header>
