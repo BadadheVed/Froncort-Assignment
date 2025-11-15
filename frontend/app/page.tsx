@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState("");
+  const [creatorName, setCreatorName] = useState("");
+  const [step, setStep] = useState<"form" | "created">("form");
   const [createdDoc, setCreatedDoc] = useState<{
     id: string;
     docId: number;
@@ -22,13 +24,18 @@ export default function HomePage() {
       return;
     }
 
+    if (!creatorName.trim()) {
+      alert("Please enter your name");
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await axios.post("/docs/create", {
         title: title.trim(),
       });
       setCreatedDoc(response.data);
-      setTitle("");
+      setStep("created");
     } catch (error) {
       console.error("Failed to create document:", error);
       alert("Failed to create document. Please try again.");
@@ -43,6 +50,13 @@ export default function HomePage() {
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const resetForm = () => {
+    setStep("form");
+    setTitle("");
+    setCreatorName("");
+    setCreatedDoc(null);
   };
 
   return (
@@ -61,51 +75,85 @@ export default function HomePage() {
         <h2 className="text-xl font-semibold text-white">
           Create New Document
         </h2>
-        <div className="flex gap-3">
-          <Input
-            placeholder="Enter document title..."
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && createDocument()}
-            className="flex-1"
-            disabled={loading}
-          />
-          <Button onClick={createDocument} disabled={loading || !title.trim()}>
-            {loading ? "Creating..." : "Create Document"}
-          </Button>
-        </div>
 
-        {createdDoc && (
-          <div className="mt-6 p-4 bg-green-900/20 border border-green-700 rounded-lg space-y-3">
-            <h3 className="text-lg font-medium text-green-300">
-              Document Created Successfully!
-            </h3>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="text-gray-400">Document ID:</span>
-                <div className="font-mono text-white text-lg">
-                  {createdDoc.docId}
-                </div>
-              </div>
-              <div>
-                <span className="text-gray-400">Pin:</span>
-                <div className="font-mono text-white text-lg">
-                  {createdDoc.pin}
-                </div>
-              </div>
+        {step === "form" ? (
+          <>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-300">
+                Your Name
+              </label>
+              <Input
+                placeholder="Enter your name..."
+                value={creatorName}
+                onChange={(e) => setCreatorName(e.target.value)}
+                maxLength={50}
+                disabled={loading}
+              />
             </div>
-            <div className="flex gap-2">
-              <Link
-                href={`/docs/${createdDoc.id}?docId=${createdDoc.docId}&pin=${createdDoc.pin}&name=Creator`}
-              >
-                <Button className="bg-green-600 hover:bg-green-700">
-                  Open Document
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-300">
+                Document Title
+              </label>
+              <Input
+                placeholder="Enter document title..."
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && createDocument()}
+                disabled={loading}
+              />
+            </div>
+
+            <Button
+              onClick={createDocument}
+              disabled={loading || !title.trim() || !creatorName.trim()}
+              className="w-full"
+            >
+              {loading ? "Creating..." : "Create Document"}
+            </Button>
+          </>
+        ) : (
+          <div className="space-y-4">
+            <div className="p-4 bg-green-900/20 border border-green-700 rounded-lg space-y-3">
+              <h3 className="text-lg font-medium text-green-300">
+                Document Created Successfully!
+              </h3>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-400">Document ID:</span>
+                  <div className="font-mono text-white text-lg">
+                    {createdDoc?.docId}
+                  </div>
+                </div>
+                <div>
+                  <span className="text-gray-400">Pin:</span>
+                  <div className="font-mono text-white text-lg">
+                    {createdDoc?.pin}
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Link
+                  href={`/docs/${createdDoc?.id}?docId=${
+                    createdDoc?.docId
+                  }&pin=${createdDoc?.pin}&name=${encodeURIComponent(
+                    creatorName
+                  )}`}
+                  className="flex-1"
+                >
+                  <Button className="bg-green-600 hover:bg-green-700 w-full">
+                    Open Document
+                  </Button>
+                </Link>
+                <Button variant="outline" onClick={copyCredentials}>
+                  {copied ? "✓ Copied!" : "Copy Credentials"}
                 </Button>
-              </Link>
-              <Button variant="outline" onClick={copyCredentials}>
-                {copied ? "✓ Copied!" : "Copy Credentials"}
-              </Button>
+              </div>
             </div>
+
+            <Button variant="outline" onClick={resetForm} className="w-full">
+              Create Another Document
+            </Button>
           </div>
         )}
       </div>
