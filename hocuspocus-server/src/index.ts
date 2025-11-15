@@ -143,7 +143,7 @@ const server = new Server({
     if (request.method === "OPTIONS") {
       response.writeHead(200);
       response.end();
-      return;
+      return { status: "handled" };
     }
 
     // WebSocket connection logs - for debugging WS connections
@@ -167,7 +167,7 @@ const server = new Server({
           2
         )
       );
-      return;
+      return { status: "handled" };
     }
 
     // Get room user count: /room/{uuid}
@@ -177,7 +177,7 @@ const server = new Server({
       if (!roomId) {
         response.writeHead(400, { "Content-Type": "application/json" });
         response.end(JSON.stringify({ error: "Room ID required" }));
-        return;
+        return { status: "handled" };
       }
 
       try {
@@ -199,7 +199,7 @@ const server = new Server({
         response.writeHead(500, { "Content-Type": "application/json" });
         response.end(JSON.stringify({ error: "Internal server error" }));
       }
-      return;
+      return { status: "handled" };
     }
 
     // Get all active rooms
@@ -219,12 +219,12 @@ const server = new Server({
           timestamp: Date.now(),
         })
       );
-      return;
+      return { status: "handled" };
     }
 
-    // Default 404
-    response.writeHead(404, { "Content-Type": "application/json" });
-    response.end(JSON.stringify({ error: "Not found" }));
+    // If it's not one of our endpoints, let Hocuspocus handle it (WebSocket upgrade)
+    // Don't send 404 here, just return undefined to pass control to Hocuspocus
+    return;
   },
 });
 
